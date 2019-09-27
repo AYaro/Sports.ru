@@ -66,18 +66,14 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   Widget build(BuildContext context) {
+    sleep(Duration(milliseconds: 500));
     return Scaffold(
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[new Transform.scale(
-              scale: 1 / _controller.value.aspectRatio,
-              child: Center(
-                child: AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: CameraPreview(_controller)),
-              )),
+          children: <Widget>[new Stack(
+                children:<Widget>[ ((!_controller.value.isInitialized) ? new Container() : buildCameraView()),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                   child: Row(
@@ -94,16 +90,14 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                           margin: const EdgeInsets.only(right: 10.0),
                           child: Text('Вперед Спартак!', style: TextStyle(fontSize: 26, color: Colors.red, fontWeight: FontWeight.bold, backgroundColor: Colors.black.withOpacity(0.5))),
                         ),
-
-                        Text('1-0', style: TextStyle(fontSize: 26, color: Colors.red, fontWeight: FontWeight.bold, backgroundColor: Colors.black.withOpacity(0.5))),
-                        Text('Гоооол!  ', style: TextStyle(fontSize: 26, color: Colors.red, fontWeight: FontWeight.bold)),
-                        Text('Вперед Спартак!  ', style: TextStyle(fontSize: 26, color: Colors.red, fontWeight: FontWeight.bold)),
-                        Text('Вперед Зенит!  ', style: TextStyle(fontSize: 26, color: Colors.lightBlue, fontWeight: FontWeight.bold)),
-
+                        Container(
+                          margin: const EdgeInsets.only(right: 10.0),
+                          child: Text('Вперед Зенит!', style: TextStyle(fontSize: 26, color: Colors.lightBlue, fontWeight: FontWeight.bold, backgroundColor: Colors.black.withOpacity(0.5))),
+                        ),
                       ]
                   )
               ),
-          ]),
+          ],)]),
 
       /*Align(
           alignment: Alignment.topCenter,
@@ -163,7 +157,27 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       ),
     );
   }
+
+  Widget buildCameraView() {
+    return new Container(
+      child: new Row(
+        children: [
+          new Expanded(
+            child: new Column(
+              children: <Widget>[
+                new AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: new CameraPreview(_controller),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
+
 
 // A widget that displays the picture taken by the user.
 class DisplayPictureScreen extends StatelessWidget {
