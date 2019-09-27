@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
+import 'package:sports/bacLib.dart';
 
 Future<void> main() async {
   // Obtain a list of the available cameras on the device.
@@ -11,6 +12,8 @@ Future<void> main() async {
 
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
+
+  FirebaseComunicator().testFunCall();
 
   runApp(
     MaterialApp(
@@ -66,7 +69,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   Widget build(BuildContext context) {
-    sleep(Duration(milliseconds: 500));
+    sleep(Duration(milliseconds: 2500));
     return Scaffold(
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
