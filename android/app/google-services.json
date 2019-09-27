@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "447070846370",
+    "firebase_url": "https://vk-hack-sports-psj.firebaseio.com",
+    "project_id": "vk-hack-sports-psj",
+    "storage_bucket": "vk-hack-sports-psj.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447070846370:android:46be217ee4378bbf0906fb",
+        "android_client_info": {
+          "package_name": "com.vkhack.sports"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "447070846370-k9rohvoskgq7uu7hjjlonvsdu1623het.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJ4DW1Io6E08DRHFbYHOREnzX7ySTij_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "447070846370-k9rohvoskgq7uu7hjjlonvsdu1623het.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
