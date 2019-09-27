@@ -72,8 +72,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[new Stack(
-                children:<Widget>[ ((!_controller.value.isInitialized) ? new Container() : buildCameraView()),
+          children: <Widget>[Center(
+                child:((!_controller.value.isInitialized) ? new Container() : buildCameraView()),
+          ),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                   child: Row(
@@ -97,41 +98,14 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                       ]
                   )
               ),
-          ],)]),
+          ],),
 
-      /*Align(
-          alignment: Alignment.topCenter,
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Flexible(
-                  flex: 1,
-                  child: FutureBuilder<void>(
-                    future: _initializeControllerFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        return CameraPreview(_controller);
-                      } else {
-                        return Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  ),
-                ),
-              ])),
-              */
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.camera_alt),
-        // Provide an onPressed callback.
-        onPressed: () async {
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
-          try {
-            // Ensure that the camera is initialized.
-            await _initializeControllerFuture;
 
-            // Construct the path where the image should be saved using the
-            // pattern package.
+        onPressed: () async {
+          try {
+            await _initializeControllerFuture;
             final path = join(
               // Store the picture in the temp directory.
               // Find the temp directory using the `path_provider` plugin.
@@ -159,22 +133,14 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   }
 
   Widget buildCameraView() {
-    return new Container(
-      child: new Row(
-        children: [
-          new Expanded(
-            child: new Column(
-              children: <Widget>[
-                new AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: new CameraPreview(_controller),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+    return
+      Transform.scale(
+          scale: 1 / _controller.value.aspectRatio,
+          child: Center(
+            child: AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: CameraPreview(_controller)),
+          ));
   }
 }
 
