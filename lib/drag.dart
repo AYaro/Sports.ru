@@ -33,10 +33,7 @@ class DraggableScreenState extends State<DraggableScreen> {
   }
 }
 
-
-
-
-class DraggableItem extends StatelessWidget {
+class DraggableItem extends StatefulWidget{
 
   String text;
   Color color;
@@ -47,10 +44,42 @@ class DraggableItem extends StatelessWidget {
   }
 
   @override
+  DraggableItemState createState() => DraggableItemState(this.text, this.color);
+}
+
+
+class DraggableItemState extends State<DraggableItem> {
+
+  Offset offset = Offset.zero;
+
+  String text;
+  Color color;
+
+  DraggableItemState(String text, Color color){
+    this.text = text;
+    this.color = color;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(left: 10.0, right: 10.0),
-      child: Text(this.text, style: TextStyle(fontSize: 26, color: this.color, fontWeight: FontWeight.bold, backgroundColor: Colors.black.withOpacity(0.5))),
-    );
+    return  Positioned(
+        left: offset.dx,
+        top: offset.dy,
+        child: GestureDetector(
+          onPanUpdate: (details){
+            setState((){
+              offset = Offset(
+                  offset.dx + details.delta.dx, offset.dy + details.delta.dy
+              );
+            });
+          },
+          child: Container(
+            height: 100,
+            width: 100,
+            margin: const EdgeInsets.only(left: 10.0, right: 10.0),
+            child: Text(this.text, style: TextStyle(fontSize: 26, color: this.color, fontWeight: FontWeight.bold)),
+          ),
+        ),
+      );
   }
 }

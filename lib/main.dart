@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
-import 'package:sports/bacLib.dart';
+import 'package:sports/drag.dart';
 
 Future<void> main() async {
   // Obtain a list of the available cameras on the device.
@@ -13,7 +13,7 @@ Future<void> main() async {
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
 
-  FirebaseComunicator().testFunCall();
+  //FirebaseComunicator().testFunCall();
 
   runApp(
     MaterialApp(
@@ -44,6 +44,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   CameraController _controller;
   Future<void> _initializeControllerFuture;
 
+  List<Widget> items = [DraggableItem("LOLOL", Color.fromARGB(255, 255, 0, 1))];
+
+
   @override
   void initState() {
     super.initState();
@@ -69,23 +72,26 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   Widget build(BuildContext context) {
-    sleep(Duration(milliseconds: 2500));
+    sleep(Duration(milliseconds: 300));
     return Scaffold(
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[Center(
-                child:((!_controller.value.isInitialized) ? new Container() : buildCameraView()),
+          children: <Widget>[Stack(
+                children:<Widget>[((!_controller.value.isInitialized) ? new Container() : buildCameraView()),
+                      if (this.items.length > 1 ) for (var item in this.items) item ,]
           ),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                   child: Row(
                       children: <Widget>[
-                        Container(
+                        InkWell(
+                            onTap: () =>  this.items.add(DraggableItem("LOLOL", Color.fromARGB(255, 255, 0, 1))),
+                            child: Container(
                           margin: const EdgeInsets.only(right: 10.0),
                           child: Text('1-0', style: TextStyle(fontSize: 26, color: Colors.red, fontWeight: FontWeight.bold, backgroundColor: Colors.black.withOpacity(0.5))),
-                        ),
+                        )),
                         Container(
                           margin: const EdgeInsets.only(right: 10.0),
                           child: Text('Гоооол!', style: TextStyle(fontSize: 26, color: Colors.red, fontWeight: FontWeight.bold, backgroundColor: Colors.black.withOpacity(0.5))),
