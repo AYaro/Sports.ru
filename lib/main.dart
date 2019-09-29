@@ -160,13 +160,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                     width: MediaQuery.of(context).size.width,
 
                   )
-                      : Transform.scale(
-                      scale: 1 / _controller.value.aspectRatio,
-                      child: Center(
-                        child: AspectRatio(
-                            aspectRatio: _controller.value.aspectRatio,
-                            child: CameraPreview(_controller)),
-                      ))),
+                      : buildCameraView()),
                   if (this.items.length > 0) for (var item in this.items) item,
                 ])),
             Container(
@@ -342,7 +336,7 @@ class DisplayPictureScreen extends StatelessWidget {
         child: Icon(Icons.share),
         backgroundColor: Color(0xFFAAAAAA),
         onPressed: imgShare(th),
-      ),*/
+      ),
     );
   }
 
