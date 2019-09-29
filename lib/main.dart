@@ -89,6 +89,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   void initState() {
     super.initState();
+    this.items.clear();
     // To display the current output from the camera,
     // create a CameraController.
     _controller = CameraController(
@@ -109,36 +110,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     super.dispose();
   }
 
-  Future<List<InkWell>> texts() async {
-    List<InkWell> ret;
-    print("-------");
-    await getText().then((value) {
-      this.req = value;
-      print(value);
-    }).catchError((error) {
-      print(error);
-    });
-    for (var text in this.req) {
-      ret.add(InkWell(
-          onTap: () =>
-              setState(() {
-                this.items.add(DraggableItem(
-                    text: "1-0", color: Color(0xFF0000FF), callback: callback));
-              }),
-          child: Container(
-            margin: const EdgeInsets.all(10.0),
-            child: Text('1-0',
-                style: TextStyle(
-                    fontSize: 26,
-                    color: Color(0xFF0000FF),
-                    fontWeight: FontWeight.bold,
-                    backgroundColor: Colors.black.withOpacity(0.5))),
-          )));
-      print(text.toString());
-    }
-    return ret;
-  }
-
   @override
   Widget build(BuildContext context) {
     sleep(Duration(milliseconds: 1500));
@@ -148,92 +119,122 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            Screenshot(
-                controller: screenshotController,
-                child:
-                Stack(
-                    children: <Widget>[
-                  ((!_controller.value.isInitialized)
-                      ? new Container(
-                    color: Color(0xFF9933FF),
-                    height:MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-
-                  )
-                      : buildCameraView()),
-                  if (this.items.length > 0) for (var item in this.items) item,
-                ])),
-            Container(
-                height: 40,
-                child: FutureBuilder(
+            Stack(children: <Widget>[
+              Screenshot(
+                  controller: screenshotController,
+                  child: Stack(children: <Widget>[
+                (FutureBuilder<void>(
+                  future: _initializeControllerFuture,
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.none &&
-                        snapshot.hasData == null) {
-                      return Container();
-                    }
                     if (snapshot.connectionState == ConnectionState.done) {
-                      var js = jsonDecode(snapshot.data);
-                      int count = 0;
-                      for (var elem in js) {
-                        count++;
-                      };
-                      return ListView.builder(
-                        itemCount: count,
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                              onTap: () =>
-                                  setState(() {
-                                    this.items.add(DraggableItem(
-                                        text: js[index]['name'].toString(),
-                                        color: Color(js[index]['color']),
-                                        callback: callback));
-                                  }),
-                              child: Container(
-                                height: 30,
-                                margin: const EdgeInsets.all(5.0),
-                                child: Text(js[index]['name'].toString(),
-                                    style: TextStyle(
-                                        fontSize: 26,
-                                        color: Color(js[index]['color']),
-                                        fontWeight: FontWeight.bold,
-                                        backgroundColor:
-                                        Colors.black.withOpacity(0.2))),
-                              ));
-                        },
-                      );
+                      // If the Future is complete, display the preview.
+                      return buildCameraView();
+                    } else {
+                      // Otherwise, display a loading indicator.
+                      return Center(child: CircularProgressIndicator());
                     }
-                    return Container();
                   },
-                  future: getText(),
                 )),
+                if (this.items != null) for (var item in this.items) item
+              ])),
+              Container(
+                  height: 80,
+                  child: FutureBuilder(
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.none &&
+                          snapshot.hasData == null) {
+                        return Container();
+                      }
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        var js = jsonDecode(snapshot.data);
+                        int count = 0;
+                        for (var elem in js) {
+                          count++;
+                        }
+                        ;
+                        return ListView.builder(
+                          itemCount: count,
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                                onTap: () => setState(() {
+                                      this.items.add(DraggableItem(
+                                          text: js[index]['name'].toString(),
+                                          color: Color(js[index]['color']),
+                                          callback: callback));
+                                    }),
+                                child: Container(
+                                  margin: const EdgeInsets.fromLTRB(
+                                      40.0, 0.0, 5.0, 0.0),
+                                  child: Text(js[index]['name'].toString(),
+                                      style: TextStyle(
+                                          fontSize: 26,
+                                          color: Color(js[index]['color']),
+                                          fontFamily: 'Nuecha',
+                                          backgroundColor:
+                                              Colors.black.withOpacity(0.2))),
+                                ));
+                          },
+                        );
+                      }
+                      return Container();
+                    },
+                    future: getText(),
+                  )),
+            ]),
             Center(
                 child: Container(
-                  color: Color(0xCC000000),
-                  height: 72,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
-                )),
+              color: Color(0xFF000000),
+              height: 50,
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: FlatButton(
+                    onPressed: () {
+                      setState(() {
+                        this.items.clear();
+                      });
+                    },
+                    child: Text("Очистить"),
+                  )),
+              width: MediaQuery.of(context).size.width,
+            )),
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton(
-            backgroundColor: Color(0xFFFFFFFF),
-            child: Icon(Icons.camera),
-            onPressed:(){ _imageFile = null;
-            screenshotController.capture()
-            .then((File image) async {
-          setState(() {
-            _imageFile = image;
-          });
-          imgShare(image.readAsBytesSync());
-            });
-            },
+          backgroundColor: Color(0xFFFFFFFF),
+          child: Icon(Icons.camera),
+          onPressed: () {
+            _imageFile = null;
+            screenshotController.capture().then((File image) async {
+              setState(() {
+                _imageFile = image;
+              });
 
-      /*() async {
+              await _initializeControllerFuture;
+              final path = join(
+                // Store the picture in the temp directory.
+                // Find the temp directory using the `path_provider` plugin.
+                (await getTemporaryDirectory()).path,
+                '${DateTime.now()}.png',
+              );
+              await _controller.takePicture(path);
+
+              // If the picture was taken, display it on a new screen.
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DisplayPictureScreen(
+                    imagePath: path,
+                    screenshot: _imageFile,
+                  ),
+                ),
+              );
+            });
+          },
+
+          /*() async {
           try {
             await _initializeControllerFuture;
             final path = join(
@@ -261,7 +262,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             print(e);
           }
         },*/
-    ));
+        ));
   }
 
   Widget buildCameraView() {
@@ -280,46 +281,34 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   _shareImage(List<int> imageBytes) async {
     try {
-      await Share.file(
-          "sports.ru story", "story", imageBytes, 'image/png');
+      await Share.file("sports.ru story", "story", imageBytes, 'image/png');
     } catch (e) {
       print('Share error: $e');
     }
   }
-
-
 }
 
 // A widget that displays the picture taken by the user.
 class DisplayPictureScreen extends StatelessWidget {
   String imagePath;
-  Data data = new Data();
+  File screenshot;
 
-  DisplayPictureScreen({Key key, this.imagePath, this.data}) : super(key: key);
+  DisplayPictureScreen({Key key, this.imagePath, this.screenshot})
+      : super(key: key);
 
   CustomImage.Image customImage;
+  CustomImage.Image ImageOne;
+  CustomImage.Image ImageTwo;
 
   List<int> imageBytes;
 
   @override
   Widget build(BuildContext context) {
-    if (this.data.textItems != null) {
-      for (var dt in this.data.textItems) {
-        print(dt.text);
-      }
-    }
-    this.customImage =
+    this.ImageOne =
         CustomImage.decodeJpg(File(this.imagePath).readAsBytesSync());
-    for (int i = 0; i < this.data.textItems.length; i++) {
-      print("i= " + i.toString());
-      CustomImage.drawString(
-          this.customImage,
-          CustomImage.arial_24,
-          this.data.textItems[i].offset.dx.round(),
-          this.data.textItems[i].offset.dy.round(),
-          this.data.textItems[i].text,
-          color: this.data.textItems[i].color.value);
-    }
+    this.ImageTwo = CustomImage.decodePng(this.screenshot.readAsBytesSync());
+
+    this.customImage = CustomImage.copyInto(ImageOne, ImageTwo);
 
     File(this.imagePath)
         .writeAsBytesSync(CustomImage.encodeJpg(this.customImage));
@@ -327,28 +316,27 @@ class DisplayPictureScreen extends StatelessWidget {
     this.imageBytes = File(this.imagePath).readAsBytesSync();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Display the Picture')),
+      appBar: AppBar(title: Text('Picture display')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
-      /*floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: Image.file(File(this.imagePath)),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.share),
         backgroundColor: Color(0xFFAAAAAA),
-        onPressed: imgShare(th),
+        onPressed: imgShare,
       ),
     );
   }
 
-  void imgShare(List<int> imageBytes) {
-    _shareImage(imageBytes);
+  void imgShare() {
+    _shareImage();
   }
 
-
-  _shareImage(List<int> imageBytes) async {
+  _shareImage() async {
     try {
       await Share.file(
-          "sports.ru story", "story", imageBytes, 'image/png');
+          "sports.ru story", "story", this.imageBytes, 'image/png');
     } catch (e) {
       print('Share error: $e');
     }

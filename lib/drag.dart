@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
-import 'package:path/path.dart' show join;
-import 'package:path_provider/path_provider.dart';
+
 
 
 class DraggableItem extends StatefulWidget{
@@ -23,7 +21,7 @@ class DraggableItem extends StatefulWidget{
 
 class DraggableItemState extends State<DraggableItem> {
 
-  Offset offset = Offset.zero;
+  Offset offset = Offset(150.0, 300.0);
 
   String text;
   Color color;
@@ -43,9 +41,6 @@ class DraggableItemState extends State<DraggableItem> {
         left: offset.dx,
         top: offset.dy,
         child: GestureDetector(
-          onPanEnd: (details){
-            refresh();
-          },
           onPanUpdate: (details){
             setState((){
               offset = Offset(
@@ -54,16 +49,17 @@ class DraggableItemState extends State<DraggableItem> {
             });
           },
           child: Container(
-            child: Text(this.text, style: TextStyle(fontSize: 26, color: this.color, fontWeight: FontWeight.bold)),
+            child: Text(this.text, style: TextStyle(fontSize: 26, fontFamily: 'Nuecha', color: this.color)),
           ),
         ),
       );
     return w;
   }
 
-  void refresh(){
+  /*void refresh(){
     widget.callback(TextData(this.text, this.offset, this.color));
   }
+   */
 
   @override
   void initState() {
@@ -77,11 +73,13 @@ class DraggableItemState extends State<DraggableItem> {
     await Future.delayed(Duration(milliseconds: 500));
   }
 
-  @override
+  /*@override
   void deactivate() {
     refresh();
     super.deactivate();
   }
+
+   */
 }
 
 class TextData{
